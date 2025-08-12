@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Global Radio – Simple</title>
+  <meta name="description" content="Escuchá radios del mundo. Búsqueda, filtros y volumen. Sin instalación." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Smooth scroll area */
+    .scroll-area { overflow-y: auto; scrollbar-width: thin; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-slate-800/70 border border-slate-700">
+            <span aria-hidden="true">🌍</span>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Global Radio</h1>
+        </div>
+        <p class="mt-2 text-slate-300 max-w-2xl">
+          Descubrí radios del mundo con una interfaz simple. Buscá por nombre, país o género y reproducí al instante.
+        </p>
+      </div>
+      <div class="hidden md:flex items-center gap-3">
+        <div class="text-slate-300 text-sm flex items-center gap-2">
+          <span>🔊</span>
+          <input id="headerVolume" type="range" min="0" max="1" step="0.01" value="0.7" class="w-48 accent-slate-300"/>
+          <span id="headerVolumeLabel" class="tabular-nums">70%</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Search + Filters -->
+    <section class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-3">
+      <div class="md:col-span-6">
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔎</span>
+          <input id="queryInput" placeholder="Buscar estación, ciudad o género…" class="pl-9 w-full rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
+        </div>
+      </div>
+      <div class="md:col-span-3">
+        <select id="countrySelect" class="w-full rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600">
+          <option value="all">Todos los países</option>
+        </select>
+      </div>
+      <div class="md:col-span-3">
+        <select id="genreSelect" class="w-full rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600">
+          <option value="all">Todos los géneros</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Quick pills -->
+    <section class="mt-6">
+      <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-3">Explorar rápido</h2>
+      <div id="quickPills" class="flex flex-wrap gap-2"></div>
+    </section>
+
+    <!-- Results + Player -->
+    <section class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Station list -->
+      <div class="lg:col-span-2 rounded-2xl border bg-slate-900/60 border-slate-800 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800">
+          <div class="text-lg font-medium">Estaciones <span id="countBadge" class="text-slate-400 text-sm"></span></div>
+        </div>
+        <div class="p-4">
+          <div class="scroll-area h-[460px] pr-2" id="stationList"></div>
+        </div>
+      </div>
+
+      <!-- Player panel -->
+      <div class="rounded-2xl border bg-slate-900/60 border-slate-800 p-5">
+        <div class="text-lg font-medium mb-3">Reproductor</div>
+        <div id="playerBox" class="rounded-2xl border border-slate-800 p-4 bg-slate-950/50">
+          <div class="text-slate-400">Seleccioná una estación para empezar.</div>
+        </div>
+
+        <div class="mt-6">
+          <h3 class="text-sm uppercase tracking-wider text-slate-400 mb-2">Favoritos</h3>
+          <div id="favsBox" class="flex flex-wrap gap-2 text-sm text-slate-400">Aún no guardaste estaciones.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-10 text-center text-xs text-slate-500">
+      Versión simple sin instalación. Funciona en cualquier hosting estático (Vercel/Netlify). Streams públicos para demo.
+    </footer>
+  </main>
+
+  <audio id="audio" preload="none" crossorigin="anonymous"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
