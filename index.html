@@ -3,27 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Global Radio – Simple</title>
-  <meta name="description" content="Escuchá radios del mundo. Búsqueda, filtros y volumen. Sin instalación." />
+  <title>Global Radio – Catálogo Mundial</title>
+  <meta name="description" content="Escuchá radios del mundo. Buscar por nombre/ciudad con catálogo mundial." />
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Smooth scroll area */
-    .scroll-area { overflow-y: auto; scrollbar-width: thin; }
-  </style>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
   <main class="max-w-6xl mx-auto px-4 py-8">
-    <!-- Header -->
     <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
       <div>
         <div class="flex items-center gap-3">
-          <div class="p-2 rounded-xl bg-slate-800/70 border border-slate-700">
-            <span aria-hidden="true">🌍</span>
-          </div>
+          <div class="p-2 rounded-xl bg-slate-800/70 border border-slate-700">🌍</div>
           <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Global Radio</h1>
         </div>
         <p class="mt-2 text-slate-300 max-w-2xl">
-          Descubrí radios del mundo con una interfaz simple. Buscá por nombre, país o género y reproducí al instante.
+          Catálogo mundial: buscá estaciones por ciudad, país o nombre (usa Radio Browser). Incluye un acceso directo a <b>Portsmouth</b>.
         </p>
       </div>
       <div class="hidden md:flex items-center gap-3">
@@ -35,30 +28,22 @@
       </div>
     </header>
 
-    <!-- Search + Filters -->
-    <section class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-3">
-      <div class="md:col-span-6">
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔎</span>
-          <input id="queryInput" placeholder="Buscar estación, ciudad o género…" class="pl-9 w-full rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
+    <!-- Online Search -->
+    <section class="mt-6 rounded-2xl border bg-slate-900/60 border-slate-800 p-4">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex-1">
+          <label class="text-sm text-slate-400">Buscar en el catálogo mundial</label>
+          <div class="mt-1 flex gap-2">
+            <input id="onlineQuery" class="flex-1 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600" placeholder="Ej: Portsmouth, London, Paris, Rock, Jazz…"/>
+            <button id="onlineSearchBtn" class="px-3 py-2 rounded-md bg-slate-200 text-slate-900 font-medium">Buscar online</button>
+          </div>
+          <p class="mt-2 text-xs text-slate-400">Tip: probá con ciudades o estilos. Ej.: <button id="portsmouthBtn" class="underline">Portsmouth</button>, <button id="londonBtn" class="underline">London</button>.</p>
+        </div>
+        <div>
+          <button id="useDemoBtn" class="px-3 py-2 rounded-md border border-slate-700 hover:bg-slate-900">Volver a lista de ejemplo</button>
         </div>
       </div>
-      <div class="md:col-span-3">
-        <select id="countrySelect" class="w-full rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600">
-          <option value="all">Todos los países</option>
-        </select>
-      </div>
-      <div class="md:col-span-3">
-        <select id="genreSelect" class="w-full rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600">
-          <option value="all">Todos los géneros</option>
-        </select>
-      </div>
-    </section>
-
-    <!-- Quick pills -->
-    <section class="mt-6">
-      <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-3">Explorar rápido</h2>
-      <div id="quickPills" class="flex flex-wrap gap-2"></div>
+      <p id="onlineStatus" class="mt-2 text-xs text-slate-400"></p>
     </section>
 
     <!-- Results + Player -->
@@ -69,7 +54,7 @@
           <div class="text-lg font-medium">Estaciones <span id="countBadge" class="text-slate-400 text-sm"></span></div>
         </div>
         <div class="p-4">
-          <div class="scroll-area h-[460px] pr-2" id="stationList"></div>
+          <div class="h-[460px] pr-2 overflow-y-auto" id="stationList"></div>
         </div>
       </div>
 
@@ -88,7 +73,7 @@
     </section>
 
     <footer class="mt-10 text-center text-xs text-slate-500">
-      Versión simple sin instalación. Funciona en cualquier hosting estático (Vercel/Netlify). Streams públicos para demo.
+      Usa <a class="underline" href="https://www.radio-browser.info/" target="_blank">Radio Browser</a> para resultados en vivo. Si alguna radio no suena puede ser por bloqueos del servidor (CORS/HTTPS).
     </footer>
   </main>
 
