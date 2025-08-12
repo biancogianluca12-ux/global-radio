@@ -1,17 +1,14 @@
-// --- Demo stations (kept) ---
+// Demo list
 const DEMO_STATIONS = [
-  { id:"radioparadise-main", name:"Radio Paradise – Main Mix", country:"United States", city:"Paradise, CA", genres:["Eclectic","Rock","Indie"], bitrate:"320 kbps", codec:"AAC", urls:["https://stream.radioparadise.com/aac-320"] },
-  { id:"somafm-groove", name:"SomaFM – Groove Salad", country:"United States", city:"San Francisco", genres:["Ambient","Downtempo"], bitrate:"128 kbps", codec:"MP3", urls:["https://ice1.somafm.com/groovesalad-128-mp3"] },
-  { id:"kexp", name:"KEXP 90.3 FM", country:"United States", city:"Seattle", genres:["Indie","Alternative"], bitrate:"128 kbps", codec:"MP3", urls:["https://kexp-mp3-128.streamguys1.com/kexp128.mp3"] },
-  { id:"nightride", name:"Nightride FM", country:"Netherlands", city:"Amsterdam", genres:["Synthwave"], bitrate:"128 kbps", codec:"M4A", urls:["https://stream.nightride.fm/nightride.m4a"] },
-  { id:"fip", name:"FIP (Radio France)", country:"France", city:"Paris", genres:["Eclectic","Jazz","World"], bitrate:"128 kbps", codec:"MP3", urls:["https://direct.fipradio.fr/live/fip-midfi.mp3"] },
-  { id:"jazz24", name:"Jazz24", country:"United States", city:"Tacoma/Seattle", genres:["Jazz"], bitrate:"96 kbps", codec:"AAC", urls:["https://live.wostreaming.net/direct/ppm-jazz24aac-ibc1"] },
-  { id:"radio-swiss-pop", name:"Radio Swiss Pop", country:"Switzerland", city:"Bern", genres:["Pop"], bitrate:"128 kbps", codec:"MP3", urls:["https://stream.srg-ssr.ch/m/rsp/mp3_128"] },
-  { id:"bbc-world", name:"BBC World Service", country:"United Kingdom", city:"London", genres:["News","Talk"], bitrate:"96 kbps", codec:"AAC", urls:["https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"] },
+  { id:"radioparadise-main", name:"Radio Paradise – Main Mix", country:"United States", city:"Paradise, CA", genres:["Eclectic","Rock","Indie"], urls:["https://stream.radioparadise.com/aac-320"] },
+  { id:"somafm-groove", name:"SomaFM – Groove Salad", country:"United States", city:"San Francisco", genres:["Ambient","Downtempo"], urls:["https://ice1.somafm.com/groovesalad-128-mp3"] },
+  { id:"kexp", name:"KEXP 90.3 FM", country:"United States", city:"Seattle", genres:["Indie","Alternative"], urls:["https://kexp-mp3-128.streamguys1.com/kexp128.mp3"] },
+  { id:"fip", name:"FIP (Radio France)", country:"France", city:"Paris", genres:["Eclectic","Jazz","World"], urls:["https://direct.fipradio.fr/live/fip-midfi.mp3"] },
+  { id:"radio-swiss-pop", name:"Radio Swiss Pop", country:"Switzerland", city:"Bern", genres:["Pop"], urls:["https://stream.srg-ssr.ch/m/rsp/mp3_128"] },
+  { id:"bbc-world", name:"BBC World Service", country:"United Kingdom", city:"London", genres:["News","Talk"], urls:["https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"] },
 ];
 
-// --- Portsmouth pack (manual, urls best-effort; puedes editarlas) ---
-// Si alguna no suena, editá 'urls' y probá con otra de la misma emisora.
+// Portsmouth pack (candidatos; algunos pueden no funcionar por CORS o licencias)
 const PORTSMOUTH_PACK = [
   {
     id: "express-fm",
@@ -19,13 +16,10 @@ const PORTSMOUTH_PACK = [
     country: "United Kingdom",
     city: "Portsmouth",
     genres: ["Community", "Variety"],
-    bitrate: "",
-    codec: "MP3/AAC",
     urls: [
-      // Intenta estas alternativas. Si una no funciona, probá la siguiente.
       "https://stream.expressfm.com/expressfm.mp3",
-      "https://stream.expressfm.com/expressfm.aac",
-      "https://edge-bau-04-gos2.sharp-stream.com/expressfm.mp3"
+      "https://edge-bau-04-gos2.sharp-stream.com/expressfm.mp3",
+      "https://stream.expressfm.com/expressfm.aac"
     ]
   },
   {
@@ -34,30 +28,29 @@ const PORTSMOUTH_PACK = [
     country: "United Kingdom",
     city: "Havant / Portsmouth Area",
     genres: ["Oldies"],
-    bitrate: "",
-    codec: "MP3",
     urls: [
       "https://stream.angelradio.co.uk/angel.mp3",
-      "http://icecast.angelradio.net:8000/angel"  // si tu hosting permite http mixto, esta suele funcionar
+      "https://uk1.internet-radio.com/proxy/angelradio?mp=/stream"
     ]
   },
   {
-    id: "victory-online",
-    name: "Victory Online (Portsmouth)",
+    id: "unmade-radio",
+    name: "Unmade Radio",
     country: "United Kingdom",
     city: "Portsmouth",
-    genres: ["Local"],
-    bitrate: "",
-    codec: "MP3",
+    genres: ["Community", "Indie"],
     urls: [
-      "https://stream.victoryonline.radio/stream.mp3", // reemplazable si no suena
-      "https://streaming.victoryonline.co.uk/live.mp3"
+      "https://streamer.radio.co/s2c4f4f6a4/listen.m3u8", // ejemplo HLS en radio.co (puede cambiar)
+      "https://streamer.radio.co/s2c4f4f6a4/listen"       // fallback directo
     ]
   }
 ];
 
 // --- State ---
 const audio = document.getElementById("audio");
+const debugBox = document.getElementById("debugBox");
+let hls = null;
+
 let state = {
   volume: 0.7,
   currentId: null,
@@ -66,8 +59,11 @@ let state = {
   mode: "demo" // 'demo' | 'portsmouth'
 };
 
+function log(msg) {
+  debugBox.textContent = msg || "";
+}
+
 function setVolume(v) {
-  state.volume = v;
   audio.volume = v;
   document.getElementById("headerVolume").value = v;
   document.getElementById("headerVolumeLabel").textContent = `${Math.round(v * 100)}%`;
@@ -75,15 +71,39 @@ function setVolume(v) {
 setVolume(state.volume);
 document.getElementById("headerVolume").addEventListener("input", (e) => setVolume(parseFloat(e.target.value)));
 
-// --- Player with URL fallbacks ---
+// Play helper with MP3/AAC/HLS support and fallbacks
 async function playWithFallback(urls) {
   for (const url of urls) {
     try {
-      audio.src = url;
-      await audio.play();
-      return true;
+      log("Intentando: " + url);
+      if (hls) { hls.destroy(); hls = null; }
+      if (url.endsWith(".m3u8")) {
+        if (audio.canPlayType("application/vnd.apple.mpegurl")) {
+          audio.src = url;
+          await audio.play();
+          return true;
+        } else if (window.Hls && window.Hls.isSupported()) {
+          hls = new Hls({ lowLatencyMode: true });
+          hls.loadSource(url);
+          hls.attachMedia(audio);
+          await new Promise((resolve, reject) => {
+            hls.on(Hls.Events.MANIFEST_PARSED, resolve);
+            hls.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) reject(data); });
+          });
+          await audio.play();
+          return true;
+        } else {
+          // No HLS support — probar siguiente URL
+          continue;
+        }
+      } else {
+        audio.src = url;
+        await audio.play();
+        return true;
+      }
     } catch (e) {
-      // intenta próxima
+      // probar siguiente
+      continue;
     }
   }
   return false;
@@ -91,7 +111,7 @@ async function playWithFallback(urls) {
 
 function playStation(st) {
   state.currentId = st.id;
-  const urls = st.urls || (st.streamUrl ? [st.streamUrl] : []);
+  const urls = st.urls || [];
   playWithFallback(urls).then((ok) => {
     if (!ok) alert("No se pudo reproducir esta emisora. Probá otra o pegá otro enlace en 'Agregar estación'.");
     renderAll();
@@ -135,11 +155,6 @@ function renderStations() {
     });
     card.appendChild(tags);
 
-    const info = document.createElement("div");
-    info.className = "mt-2 text-xs text-slate-400";
-    info.textContent = s.codec && s.bitrate ? `${s.codec} • ${s.bitrate}` : (s.codec || s.bitrate || "");
-    card.appendChild(info);
-
     const playRow = document.createElement("div");
     playRow.className = "mt-3 flex items-center gap-2";
     const btn = document.createElement("button");
@@ -176,8 +191,8 @@ function renderPlayer() {
       <button id="togglePlay" class="px-3 py-1.5 rounded-md bg-slate-200 text-slate-900 font-medium">${audio.paused ? "Reproducir" : "Pausar"}</button>
       <div class="text-slate-300 text-sm flex items-center gap-2">
         <span>🔊</span>
-        <input id="playerVolume" type="range" min="0" max="1" step="0.01" value="${state.volume}" class="w-40 accent-slate-300"/>
-        <span id="playerVolumeLabel" className="tabular-nums">${Math.round(state.volume * 100)}%</span>
+        <input id="playerVolume" type="range" min="0" max="1" step="0.01" value="${audio.volume}" class="w-40 accent-slate-300"/>
+        <span id="playerVolumeLabel" class="tabular-nums">${Math.round(audio.volume * 100)}%</span>
       </div>
     </div>
   `;
@@ -191,6 +206,12 @@ function renderPlayer() {
     setVolume(v);
     document.getElementById("playerVolumeLabel").textContent = `${Math.round(v * 100)}%`;
   });
+}
+
+function setVolume(v) {
+  audio.volume = v;
+  document.getElementById("headerVolume").value = v;
+  document.getElementById("headerVolumeLabel").textContent = `${Math.round(v * 100)}%`;
 }
 
 function renderModeLabel() {
@@ -220,6 +241,7 @@ function renderAll() {
   renderStations();
   renderPlayer();
   renderFavs();
+  log("");
 }
 
 function toggleFav(id) {
@@ -229,7 +251,7 @@ function toggleFav(id) {
   renderAll();
 }
 
-// --- Mode buttons ---
+// Buttons
 document.getElementById("useDemoBtn").addEventListener("click", () => {
   state.mode = "demo";
   state.stations = DEMO_STATIONS.slice();
@@ -238,12 +260,10 @@ document.getElementById("useDemoBtn").addEventListener("click", () => {
 });
 document.getElementById("usePortsmouthBtn").addEventListener("click", () => {
   state.mode = "portsmouth";
-  state.stations = PORTSMOUTH_PACK.slice().map((s) => ({...s}));
+  state.stations = PORTSMOUTH_PACK.slice();
   state.currentId = null;
   renderAll();
 });
-
-// --- Add manual station ---
 document.getElementById("addManualBtn").addEventListener("click", () => {
   const name = document.getElementById("manName").value.trim();
   const city = document.getElementById("manCity").value.trim();
@@ -251,18 +271,15 @@ document.getElementById("addManualBtn").addEventListener("click", () => {
   const url = document.getElementById("manUrl").value.trim();
   if (!name || !url) { alert("Necesitás al menos nombre y URL del stream."); return; }
   const id = (name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `manual-${Date.now()}`) + Math.floor(Math.random()*1000);
-  const station = { id, name, city, country, genres: [], codec: "", bitrate: "", urls:[url] };
+  const station = { id, name, city, country, urls:[url] };
   state.stations.unshift(station);
   state.currentId = id;
   playStation(station);
-  document.getElementById("manName").value = "";
-  document.getElementById("manCity").value = "";
-  document.getElementById("manCountry").value = "";
-  document.getElementById("manUrl").value = "";
+  ["manName","manCity","manCountry","manUrl"].forEach(i => document.getElementById(i).value = "");
   renderAll();
 });
 
-// Sync play/pause labels
+// sync
 audio.addEventListener("play", renderAll);
 audio.addEventListener("pause", renderAll);
 

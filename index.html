@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Global Radio – Portsmouth Pack</title>
-  <meta name="description" content="Escuchá radios del mundo. Pack prearmado Portsmouth + agregar estaciones manualmente." />
+  <title>Global Radio – Portsmouth Pack (HLS)</title>
+  <meta name="description" content="Pack Portsmouth con soporte HLS (.m3u8) y múltiples enlaces de respaldo por emisora." />
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- hls.js para reproducir .m3u8 en navegadores que no lo soportan nativo -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
   <main class="max-w-6xl mx-auto px-4 py-8">
@@ -16,7 +18,7 @@
           <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Global Radio</h1>
         </div>
         <p class="mt-2 text-slate-300 max-w-2xl">
-          Versión sin llamadas externas. Incluye un <b>Pack Portsmouth</b> y la opción de <b>agregar radios manualmente</b> pegando la URL del stream (.mp3/.aac).
+          Versión sin llamadas externas. <b>Pack Portsmouth</b> con varias URLs por emisora y soporte HLS (.m3u8). Si una no funciona, prueba las siguientes.
         </p>
       </div>
       <div class="hidden md:flex items-center gap-3">
@@ -45,7 +47,7 @@
             <input id="manUrl" placeholder="URL del stream (.mp3/.aac/.m3u8)" class="md:col-span-1 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
             <button id="addManualBtn" class="md:col-span-1 px-3 py-2 rounded-md bg-slate-200 text-slate-900 font-medium">Agregar</button>
           </div>
-          <p class="mt-2 text-xs text-slate-400">Tip: si la radio te da varios links, cualquiera que termine en .mp3 o .aac suele funcionar.</p>
+          <p class="mt-2 text-xs text-slate-400">Tip: si la radio te da varios links, usa el que termine en .mp3, .aac o .m3u8.</p>
         </div>
       </div>
       <div class="rounded-2xl border bg-slate-900/60 border-slate-800 p-4">
@@ -72,11 +74,12 @@
         <div id="playerBox" class="rounded-2xl border border-slate-800 p-4 bg-slate-950/50">
           <div class="text-slate-400">Seleccioná una estación para empezar.</div>
         </div>
+        <div id="debugBox" class="mt-3 text-xs text-slate-400"></div>
       </div>
     </section>
 
     <footer class="mt-10 text-center text-xs text-slate-500">
-      Pack manual. Si alguna emisora no suena, probá otra URL de la misma radio.
+      Si una emisora falla puede ser por CORS o región. Probá otra URL de la misma estación.
     </footer>
   </main>
 
