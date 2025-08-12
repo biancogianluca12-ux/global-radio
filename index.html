@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Global Radio – Catálogo Mundial</title>
-  <meta name="description" content="Escuchá radios del mundo. Buscar por nombre/ciudad con catálogo mundial." />
+  <title>Global Radio – Portsmouth Pack</title>
+  <meta name="description" content="Escuchá radios del mundo. Pack prearmado Portsmouth + agregar estaciones manualmente." />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
@@ -16,7 +16,7 @@
           <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Global Radio</h1>
         </div>
         <p class="mt-2 text-slate-300 max-w-2xl">
-          Catálogo mundial: buscá estaciones por ciudad, país o nombre (usa Radio Browser). Incluye un acceso directo a <b>Portsmouth</b>.
+          Versión sin llamadas externas. Incluye un <b>Pack Portsmouth</b> y la opción de <b>agregar radios manualmente</b> pegando la URL del stream (.mp3/.aac).
         </p>
       </div>
       <div class="hidden md:flex items-center gap-3">
@@ -28,22 +28,30 @@
       </div>
     </header>
 
-    <!-- Online Search -->
-    <section class="mt-6 rounded-2xl border bg-slate-900/60 border-slate-800 p-4">
-      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-        <div class="flex-1">
-          <label class="text-sm text-slate-400">Buscar en el catálogo mundial</label>
-          <div class="mt-1 flex gap-2">
-            <input id="onlineQuery" class="flex-1 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600" placeholder="Ej: Portsmouth, London, Paris, Rock, Jazz…"/>
-            <button id="onlineSearchBtn" class="px-3 py-2 rounded-md bg-slate-200 text-slate-900 font-medium">Buscar online</button>
-          </div>
-          <p class="mt-2 text-xs text-slate-400">Tip: probá con ciudades o estilos. Ej.: <button id="portsmouthBtn" class="underline">Portsmouth</button>, <button id="londonBtn" class="underline">London</button>.</p>
+    <!-- Mode toggle + Add manual -->
+    <section class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="lg:col-span-2 rounded-2xl border bg-slate-900/60 border-slate-800 p-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="useDemoBtn" class="px-3 py-2 rounded-md border border-slate-700 hover:bg-slate-900">Lista de ejemplo</button>
+          <button id="usePortsmouthBtn" class="px-3 py-2 rounded-md bg-slate-200 text-slate-900 font-medium">Pack Portsmouth</button>
+          <span id="modeLabel" class="ml-2 text-xs text-slate-400"></span>
         </div>
-        <div>
-          <button id="useDemoBtn" class="px-3 py-2 rounded-md border border-slate-700 hover:bg-slate-900">Volver a lista de ejemplo</button>
+        <div class="mt-4">
+          <div class="text-sm text-slate-300 font-medium mb-2">Agregar estación manualmente</div>
+          <div class="grid grid-cols-1 md:grid-cols-6 gap-2">
+            <input id="manName" placeholder="Nombre (ej: Express FM)" class="md:col-span-2 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
+            <input id="manCity" placeholder="Ciudad (ej: Portsmouth)" class="md:col-span-1 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
+            <input id="manCountry" placeholder="País (ej: UK)" class="md:col-span-1 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
+            <input id="manUrl" placeholder="URL del stream (.mp3/.aac/.m3u8)" class="md:col-span-1 rounded-md border bg-slate-900/70 border-slate-700 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-600"/>
+            <button id="addManualBtn" class="md:col-span-1 px-3 py-2 rounded-md bg-slate-200 text-slate-900 font-medium">Agregar</button>
+          </div>
+          <p class="mt-2 text-xs text-slate-400">Tip: si la radio te da varios links, cualquiera que termine en .mp3 o .aac suele funcionar.</p>
         </div>
       </div>
-      <p id="onlineStatus" class="mt-2 text-xs text-slate-400"></p>
+      <div class="rounded-2xl border bg-slate-900/60 border-slate-800 p-4">
+        <div class="text-sm text-slate-300 font-medium mb-2">Favoritos</div>
+        <div id="favsBox" class="flex flex-wrap gap-2 text-sm text-slate-400">Aún no guardaste estaciones.</div>
+      </div>
     </section>
 
     <!-- Results + Player -->
@@ -64,16 +72,11 @@
         <div id="playerBox" class="rounded-2xl border border-slate-800 p-4 bg-slate-950/50">
           <div class="text-slate-400">Seleccioná una estación para empezar.</div>
         </div>
-
-        <div class="mt-6">
-          <h3 class="text-sm uppercase tracking-wider text-slate-400 mb-2">Favoritos</h3>
-          <div id="favsBox" class="flex flex-wrap gap-2 text-sm text-slate-400">Aún no guardaste estaciones.</div>
-        </div>
       </div>
     </section>
 
     <footer class="mt-10 text-center text-xs text-slate-500">
-      Usa <a class="underline" href="https://www.radio-browser.info/" target="_blank">Radio Browser</a> para resultados en vivo. Si alguna radio no suena puede ser por bloqueos del servidor (CORS/HTTPS).
+      Pack manual. Si alguna emisora no suena, probá otra URL de la misma radio.
     </footer>
   </main>
 
